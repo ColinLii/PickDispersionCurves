@@ -1,13 +1,9 @@
 # A simple GUI 
 # for extracting dispersion curves from dispersion spectrum
-# TODO: outlier detection
 
 import  tkinter
 from matplotlib.backends.backend_tkagg import(
     FigureCanvasTkAgg, NavigationToolbar2Tk
-)
-from matplotlib.backend_bases import(
-    button_press_handler, key_press_handler
 )
 from matplotlib import pyplot as plt
 from matplotlib.path import Path
@@ -16,6 +12,8 @@ import numpy as np
 import h5py
 import os
 import yaml
+import argparse
+
 
 def find_closel(a,x):
     return int((a-x[0])/(x[1]-x[0]))
@@ -251,20 +249,30 @@ class DispersionSpectrum():
         self.dispersionCurves[self.indx][self.order]['c'] = y
 
 
-#Dir =  'G:\\FromOneDrive20100119\\GetdataPython\\GatheredData\\Circle35'
-Dir =  '.'
-filename = 'ds.h5'
-outfile  = 'out.yml'
-filepath = os.path.join(Dir, filename)
-#outfile = os.path.join(Dir,outfile)
-h5file = h5py.File(filepath, 'r')
-data = h5file["ds"][:]
-f = h5file["f"][:]
-c = h5file["c"][:]
-h5file.close()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Select dispersion spectrums")
+    parser.add_argument(
+        "--infile",
+        default="ds.h5",
+        help="input file[ds.h5]")
+    parser.add_argument(
+        "--outfile",
+        default="config.yml",
+        help="config file[config.yml]")
+    args = parser.parse_args()
+
+    filepath = args.infile
+    outfile  = args.outfile
+    h5file = h5py.File(filepath, 'r')
+    data = h5file["ds"][:]
+    f = h5file["f"][:]
+    c = h5file["c"][:]
+    h5file.close()
 
 
-root = tkinter.Tk()
-DispersionSpectrum(f, c, data,  outfile, root)
+    root = tkinter.Tk()
+    DispersionSpectrum(f, c, data,  outfile, root)
 
-root.mainloop()
+    root.mainloop()
